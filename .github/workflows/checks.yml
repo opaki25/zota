@@ -22,7 +22,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - run: npm ci
+      - run: node scripts/check-native-dependencies.mjs --lock-only
+      - run: npm ci --include=dev --include=optional
+      - run: node scripts/check-native-dependencies.mjs
       - run: node --experimental-strip-types --test scripts/api-proxy.test.mjs
       - run: npm run typecheck
       - run: npm run build

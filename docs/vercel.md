@@ -33,6 +33,8 @@ The binding is read inside a Node.js route function on each request. It is not r
 
 Python is pinned to 3.12 using `apps/api/.python-version`. Vercel's detected `requirements.txt` includes the tested lockfile. The root npm workspace/lockfile remains the source for web dependencies. Neither service requires a custom top-level build command.
 
+The web service explicitly installs development and optional dependencies using `npm ci`. Lightning CSS and Tailwind Oxide require platform-specific native packages. Regenerate the lockfile in a clean directory containing the workspace manifests, without an existing `node_modules` tree, so Windows does not omit the Linux packages used by Vercel. Direct web dependency versions are pinned. Run `node scripts/check-native-dependencies.mjs --lock-only` to verify all native variants are recorded, and omit `--lock-only` after installation to load and exercise the native modules on the current platform. Ubuntu CI runs both checks before the production build.
+
 ## Local service testing
 
 Install Node/npm, Python 3.12, the project dependencies, and a current Vercel CLI with Services support. Activate `.venv` and make the Python runtime available to the CLI. Provide local PostgreSQL/Redis (or isolated hosted development resources), apply migrations, and create an account first. Export API environment settings into the shell used for the command, including `APP_ORIGIN=http://localhost:3000`, `SECURE_COOKIES=false`, and `API_ROOT_PATH=/api`.

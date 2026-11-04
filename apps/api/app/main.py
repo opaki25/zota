@@ -19,7 +19,7 @@ from .config import settings
 from .db import get_db
 from .models import User, Session, Recovery, Business, Contact, Opportunity, Note, FollowUp, Audit, Preference, now
 
-app = FastAPI(title='Zota API', version='0.1.0')
+app = FastAPI(title='Zota API', version='0.1.0', root_path=settings.api_root_path)
 passwords = PasswordHash.recommended()
 dummy_hash = passwords.hash(secrets.token_urlsafe(24))
 redis = Redis.from_url(settings.redis_url)

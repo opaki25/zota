@@ -1,6 +1,9 @@
 node_modules/
 .next/
 .env
+.env.local
+.env.*.local
+.vercel/
 .venv/
 __pycache__/
 .pytest_cache/

@@ -16,9 +16,13 @@ A business development workspace for an independent website studio. **Phase 1 im
 
 ## Architecture
 
-`apps/web` is a Next.js App Router application using Tailwind, Lucide, and a shadcn-style Radix/CVA Button primitive. The browser calls same-origin `/api/*`; Next rewrites requests to FastAPI. Only the backend accesses PostgreSQL and provider secrets. `apps/api/app` contains authentication, schema validation, persistence, CRM endpoints, and the worker entry point. Alembic owns schema initialization; the app never silently creates tables on startup.
+`apps/web` is a Next.js App Router application using Tailwind, Lucide, and a shadcn-style Radix/CVA Button primitive. The browser calls same-origin `/api/*`; a Next Node.js route handler forwards requests to FastAPI using the runtime service binding on Vercel (or LOCAL_API_URL locally). Only the backend accesses PostgreSQL and provider secrets. `apps/api/app` contains authentication, schema validation, persistence, CRM endpoints, and the worker entry point. Alembic owns schema initialization; the app never silently creates tables on startup.
 
 PostgreSQL is the deployment database. SQLite is supported for isolated development and unit tests, not as a production substitute. Redis must be available for login/recovery rate limiting; failure is closed with HTTP 503. Celery is scaffolded with a health task only; there are no discovery or delivery jobs yet.
+
+## Vercel deployment
+
+The root `vercel.json` configures one public `web` service and an internal `api` service connected by a runtime binding. Browser API paths stay at `/api/*`. See [Vercel configuration and setup](docs/vercel.md) and `.env.vercel.example`. This repository configuration does not provision external databases or create a Vercel deployment. Configure the documented environment values when importing the repository.
 
 ## Quick start with Docker
 
@@ -29,7 +33,7 @@ docker compose up --build -d
 docker compose exec api python -m app.manage you@yourstudio.com
 ```
 
-The account CLI prompts privately for a password of at least 12 characters. No default account or password is provided. Open http://localhost:3000. API documentation is at http://localhost:8000/docs. Use the same hostname configured in `APP_ORIGIN`; `localhost` and `127.0.0.1` are different origins.
+The account CLI prompts privately for a password of at least 12 characters. No default account or password is provided. Open http://localhost:3000. API documentation is at http://localhost:3000/api/docs when API_ROOT_PATH=/api. Use the same hostname configured in `APP_ORIGIN`; `localhost` and `127.0.0.1` are different origins.
 
 Add a team member with `docker compose exec api python -m app.manage editor@example.com --role editor` (or `viewer`). All users share the studio workspace; this is not a multi-tenant product.
 
@@ -55,6 +59,7 @@ In another terminal from the repository root, run `npm run dev`. Visit **http://
 ## Tests and checks
 
 ```sh
+node --experimental-strip-types --test scripts/api-proxy.test.mjs
 npm run typecheck
 npm run build
 cd apps/api
@@ -65,7 +70,7 @@ alembic check
 
 The API suite covers access control, CSRF, origin rejection, session expiry/logout, single-use password reset, session revocation, CRM persistence, declined-lead reminders, excluded countries, atomic duplicate imports, and formula-safe exports. Tests use an isolated in-memory database and disable only Redis rate limiting. Never set `TESTING=true` in a deployed environment.
 
-**Validation status in the authoring environment:** All 12 API tests pass. Python syntax/source checks pass. The initial Alembic migration runs on SQLite and `alembic check` reports no schema drift. Backend dependencies are pinned in `requirements-lock.txt`; frontend dependencies are recorded in `package-lock.json` (generated from cached package metadata). Frontend installation failed with a network connection reset; its retry stalled and a separate request to the Next.js package URL timed out. The stalled installer was stopped. Next.js successfully compiled the frontend source, then failed its TypeScript stage because the interrupted install omitted Next.js declaration files (`next` and `next/types.js`). TypeScript configuration issues found during checks were fixed. A complete production build and browser verification remain outstanding; dependency errors have not been hidden with stubs or disabled type checks. Retry `npm ci` when registry access is working, then run the checks above. PostgreSQL and Docker execution are not verified because those runtimes are unavailable here. No production-readiness claim is made.
+**Validation status in the authoring environment:** All 14 API/deployment tests and 5 Node proxy tests pass. Python syntax/source checks pass. The initial Alembic migration runs on SQLite and `alembic check` reports no schema drift. Backend dependencies are pinned in `requirements-lock.txt`; frontend dependencies are recorded in `package-lock.json` (generated from cached package metadata). Frontend installation failed with a network connection reset; its retry stalled and a separate request to the Next.js package URL timed out. The stalled installer was stopped. Next.js successfully compiled the frontend source, then failed its TypeScript stage because the interrupted install omitted Next.js declaration files (`next` and `next/types.js`). TypeScript configuration issues found during checks were fixed. A complete production build and browser verification remain outstanding; dependency errors have not been hidden with stubs or disabled type checks. Retry `npm ci` when registry access is working, then run the checks above. PostgreSQL and Docker execution are not verified because those runtimes are unavailable here. No production-readiness claim is made.
 
 ## CSV format
 

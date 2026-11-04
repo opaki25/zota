@@ -6,7 +6,7 @@ Deletion is explicitly ordered in the API so it works in SQLite and PostgreSQL w
 
 ## API
 
-OpenAPI is generated at `/openapi.json`, with interactive documentation at `/docs`. Through the web origin, prefix paths with `/api`.
+OpenAPI is generated at `/openapi.json`, with interactive documentation at `/docs`. Through the web origin, prefix paths with `/api`; the Node.js route handler removes that prefix before calling the bound backend. Set `API_ROOT_PATH=/api` so documentation/schema URLs use the public prefix. Cookies, Origin, CSRF headers, response statuses, and download headers are forwarded.
 
 | Method | Route | Purpose |
 | --- | --- | --- |

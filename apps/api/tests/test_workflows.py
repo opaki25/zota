@@ -1,7 +1,3 @@
-import os
-os.environ['DATABASE_URL'] = 'sqlite://'
-os.environ['TESTING'] = 'true'
-os.environ['SECURE_COOKIES'] = 'false'
 from datetime import timedelta
 import pytest
 from fastapi.testclient import TestClient

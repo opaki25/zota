@@ -1,13 +1,17 @@
 # Deployment and operations
 
-This is a Phase 1 implementation with 12 passing API tests and a verified SQLite migration/schema comparison. Frontend installation/build, browser checks, PostgreSQL, and Docker verification remain outstanding. Do not expose it publicly until builds/tests, PostgreSQL migration checks, and a staging authentication walkthrough pass.
+This is a Phase 1 implementation with 14 passing API/deployment tests and 5 passing Node proxy tests and a verified SQLite migration/schema comparison. Frontend installation/build, browser checks, PostgreSQL, and Docker verification remain outstanding. Do not expose it publicly until builds/tests, PostgreSQL migration checks, and a staging authentication walkthrough pass.
 
-## Deployment path
+## Vercel
+
+See [Vercel multi-service deployment](vercel.md) for the service topology, required environment values, external databases, and local `vercel dev` testing.
+
+## Docker deployment path
 
 1. Install and lock frontend/backend dependencies; run the documented test suite and build.
 2. Provision PostgreSQL and Redis on a private network. Use managed backups and encrypted transport where available.
 3. Configure `.env` or a secrets manager. Use a URL-safe database password (or percent-encode it in a separately supplied SQLAlchemy URL). Never prefix secret variables with `NEXT_PUBLIC_`.
-4. Build both images. Next's rewrite target is read during build; the Dockerfile uses `http://api:8000`. If deploying outside Compose, rebuild with the correct internal API target. Do not assume changing the runtime environment changes compiled rewrites.
+4. Build both images. Compose supplies `LOCAL_API_URL=http://api:8000` to the web container at runtime. The proxy reads it in a route handler; no backend URL is baked into the frontend build. Vercel uses its automatically injected `API_SERVICE_URL` binding instead.
 5. Run `alembic upgrade head` as a single release job before starting replicated APIs. The provided local Compose startup runs it automatically for its single API container.
 6. Put an HTTPS reverse proxy in front of the web service. Set `APP_ORIGIN` to the exact public origin and `SECURE_COOKIES=true`. Keep API, database, and Redis inaccessible from the public network.
 7. Create the first administrator using the CLI; verify login, creation/editing of a test lead, notes, reminders, export, recovery, and logout. Delete the test data afterward.

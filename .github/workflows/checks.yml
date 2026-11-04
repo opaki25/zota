@@ -23,5 +23,6 @@ jobs:
         with:
           node-version: '24'
       - run: npm ci
+      - run: node --experimental-strip-types --test scripts/api-proxy.test.mjs
       - run: npm run typecheck
       - run: npm run build

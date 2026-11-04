@@ -1,6 +1,6 @@
 # Deployment and operations
 
-This is a Phase 1 implementation with 14 passing API/deployment tests and 5 passing Node proxy tests and a verified SQLite migration/schema comparison. Frontend installation/build, browser checks, PostgreSQL, and Docker verification remain outstanding. Do not expose it publicly until builds/tests, PostgreSQL migration checks, and a staging authentication walkthrough pass.
+This is a Phase 1 implementation with 14 passing API/deployment tests and 5 passing Node proxy tests and a verified SQLite migration/schema comparison. Vercel frontend compilation and TypeScript checks passed at commit d25059a. The complete multi-service deployment, browser checks, PostgreSQL, and Docker verification remain outstanding. Do not expose it publicly until builds/tests, PostgreSQL migration checks, and a staging authentication walkthrough pass.
 
 ## Vercel
 

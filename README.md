@@ -45,7 +45,7 @@ Requires Node 24 with npm, Python 3.12+, PostgreSQL, and Redis. Run database and
 npm ci
 python -m venv .venv
 # Activate the virtual environment for your shell.
-pip install -r apps/api/requirements-lock.txt
+pip install -r apps/api/requirements.txt
 docker compose up postgres redis -d
 cd apps/api
 # Copy the root .env into this directory for local API commands, or export its variables.
@@ -70,7 +70,7 @@ alembic check
 
 The API suite covers access control, CSRF, origin rejection, session expiry/logout, single-use password reset, session revocation, CRM persistence, declined-lead reminders, excluded countries, atomic duplicate imports, and formula-safe exports. Tests use an isolated in-memory database and disable only Redis rate limiting. Never set `TESTING=true` in a deployed environment.
 
-**Validation status in the authoring environment:** All 14 API/deployment tests and 5 Node proxy tests pass. Python syntax/source checks pass. The initial Alembic migration runs on SQLite and `alembic check` reports no schema drift. Backend dependencies are pinned in `requirements-lock.txt`; frontend dependencies are recorded in `package-lock.json` (generated from cached package metadata). Frontend installation failed with a network connection reset; its retry stalled and a separate request to the Next.js package URL timed out. The stalled installer was stopped. Next.js successfully compiled the frontend source, then failed its TypeScript stage because the interrupted install omitted Next.js declaration files (`next` and `next/types.js`). TypeScript configuration issues found during checks were fixed. A complete production build and browser verification remain outstanding; dependency errors have not been hidden with stubs or disabled type checks. Retry `npm ci` when registry access is working, then run the checks above. PostgreSQL and Docker execution are not verified because those runtimes are unavailable here. No production-readiness claim is made.
+**Validation status:** The 14 Python API/deployment tests, 5 Node proxy tests, source checks, and SQLite migration/schema comparison pass. Vercel successfully compiled the frontend, completed TypeScript, and generated its pages at commit `d25059a`. The subsequent Python build failed while resolving a nested requirements-file include; the manifest is now self-contained, with the same 56 validated dependency pins used by Docker and CI. A complete multi-service deployment, browser workflow, and hosted PostgreSQL/Redis checks still require verification.
 
 ## CSV format
 

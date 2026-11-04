@@ -1,0 +1,27 @@
+name: Phase 1 checks
+on: [push, pull_request]
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r apps/api/requirements-lock.txt
+      - run: python -m pytest tests -q
+        working-directory: apps/api
+      - run: alembic upgrade head && alembic check
+        working-directory: apps/api
+        env:
+          DATABASE_URL: sqlite:///./migration-check.db
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build

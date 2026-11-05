@@ -79,3 +79,32 @@ class Preference(Base):
     __tablename__ = 'preferences'
     key: Mapped[str] = mapped_column(String(80), primary_key=True)
     value: Mapped[str] = mapped_column(Text)
+
+class Prospect(Identity, Base):
+    __tablename__ = 'prospects'
+    place_id: Mapped[str] = mapped_column(String(300), unique=True)
+    name: Mapped[str] = mapped_column(String(200))
+    city: Mapped[str] = mapped_column(String(200))
+    industry: Mapped[str] = mapped_column(String(100))
+    evidence: Mapped[str] = mapped_column(Text)
+    state: Mapped[str] = mapped_column(String(40), default='Review required')
+    business_id: Mapped[str | None] = mapped_column(ForeignKey('businesses.id', ondelete='SET NULL'), nullable=True)
+
+class Outreach(Identity, Base):
+    __tablename__ = 'outreach'
+    __table_args__ = (UniqueConstraint('business_id', 'channel'),)
+    business_id: Mapped[str | None] = mapped_column(ForeignKey('businesses.id', ondelete='SET NULL'), nullable=True)
+    channel: Mapped[str] = mapped_column(String(20))
+    recipient: Mapped[str] = mapped_column(String(320))
+    subject: Mapped[str] = mapped_column(String(200))
+    body: Mapped[str] = mapped_column(Text)
+    state: Mapped[str] = mapped_column(String(30), default='Draft')
+    provider_id: Mapped[str] = mapped_column(String(300), default='')
+    optout_token: Mapped[str] = mapped_column(String(100), unique=True)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    response: Mapped[str] = mapped_column(Text, default='')
+
+class Suppression(Base):
+    __tablename__ = 'suppressions'
+    recipient: Mapped[str] = mapped_column(String(320), primary_key=True)
+    reason: Mapped[str] = mapped_column(String(100))

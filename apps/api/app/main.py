@@ -68,7 +68,8 @@ def audit(db, user, action, entity=''):
 @app.middleware('http')
 async def security(request, call_next):
     if request.method not in ('GET', 'HEAD', 'OPTIONS'):
-        if request.headers.get('origin') != settings.app_origin:
+        public_optout = request.url.path.startswith('/outreach/unsubscribe/')
+        if not public_optout and request.headers.get('origin') != settings.app_origin:
             return Response('Origin not allowed', status_code=403)
         if int(request.headers.get('content-length', '0')) > 1_000_000:
             return Response('Request too large', status_code=413)
@@ -371,3 +372,6 @@ def save_preferences(data: Preferences, user: User = Depends(admin), db: DB = De
     audit(db, user, 'settings.updated')
     db.commit()
     return data
+
+from .growth import register as register_growth
+register_growth(app, actor, admin, audit, limit)

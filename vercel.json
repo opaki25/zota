@@ -21,6 +21,17 @@
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": { "service": "web" } }
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "web"
+      }
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/growth/run",
+      "schedule": "0 14 * * *"
+    }
   ]
 }

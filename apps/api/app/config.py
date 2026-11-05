@@ -15,6 +15,13 @@ class Settings(BaseSettings):
     smtp_user: str = ''
     smtp_password: str = ''
     mail_from: str = ''
+    google_places_api_key: str = ''
+    brave_search_api_key: str = ''
+    whatsapp_access_token: str = ''
+    whatsapp_phone_number_id: str = ''
+    whatsapp_template_name: str = ''
+    whatsapp_graph_version: str = ''
+    cron_secret: str = ''
 
     @model_validator(mode='after')
     def validate_vercel_environment(self):

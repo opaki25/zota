@@ -34,7 +34,7 @@ export async function proxyApi(
   target.search = new URL(request.url).search;
 
   const headers = new Headers();
-  for (const name of ['accept', 'content-type', 'cookie', 'origin', 'x-csrf-token']) {
+  for (const name of ['accept', 'content-type', 'cookie', 'origin', 'x-csrf-token', 'authorization']) {
     const value = request.headers.get(name);
     if (value !== null) headers.set(name, value);
   }
@@ -47,7 +47,7 @@ export async function proxyApi(
       body,
       cache: 'no-store',
       redirect: 'manual',
-      signal: AbortSignal.timeout(30_000),
+      signal: AbortSignal.timeout(240_000),
     });
     const outgoing = new Headers();
     for (const name of ['content-type', 'content-disposition', 'retry-after', 'www-authenticate', 'x-content-type-options', 'x-frame-options']) {

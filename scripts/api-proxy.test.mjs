@@ -86,3 +86,14 @@ test('service ingress and caller binding match the runtime route', async () => {
   assert.deepEqual(config.services.web.bindings, [{ type: 'service', service: 'api', format: 'url', env: 'API_SERVICE_URL' }]);
   assert.deepEqual(config.rewrites, [{ source: '/(.*)', destination: { service: 'web' } }]);
 });
+
+test('forwards scheduler authorization only to the bound service', async () => {
+  let auth;
+  const response = await proxyApi(new Request('https://studio.test/api/growth/run', { headers: { Authorization: 'Bearer test-scheduler-secret' } }), ['growth', 'run'], { API_SERVICE_URL: 'https://api.test' }, async (url, init) => {
+    assert.equal(String(url), 'https://api.test/growth/run');
+    auth = init.headers.get('authorization');
+    return Response.json({ sent: 0 });
+  });
+  assert.equal(response.status, 200);
+  assert.equal(auth, 'Bearer test-scheduler-secret');
+});
